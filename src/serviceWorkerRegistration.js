@@ -1,6 +1,4 @@
-// Este archivo permite registrar el service worker de la PWA
-
-// Comprueba si el navegador soporta service workers
+// serviceWorkerRegistration.js
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||
