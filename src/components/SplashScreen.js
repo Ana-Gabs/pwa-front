@@ -1,13 +1,12 @@
+// src/components/SplashScreen.js
 import React from 'react';
-import '../styles/SplashScreen.css'; 
+import '../styles/SplashScreen.css';
 
-const SplashScreen = () => {
+export default function SplashScreen() {
   return (
-    <div className="splash-screen">
-      <h1>To-Do IDGS11</h1>
-      <p>Cargando...</p>
+    <div className="splash">
+      <p>Cargando tareas…</p>
+      <div className="spinner" />
     </div>
   );
-};
-
-export default SplashScreen;
+}
