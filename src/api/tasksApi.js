@@ -1,49 +1,55 @@
-// src/api/tasksApi.js
-import Constants from '../constants';
+import { API } from '../constants/index';
 
-export const getTasks = async () => {
-  try {
-    const response = await fetch(`${Constants.BASE_URL}${Constants.TASKS_ENDPOINT}`);
-    return await response.json();
-  } catch (error) {
-    console.error("Error obteniendo tareas:", error);
-    return [];
+async function handleResponse(res) {
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || 'API error');
   }
-};
+  return res.json();
+}
 
-export const createTask = async (task) => {
-  try {
-    const response = await fetch(`${Constants.BASE_URL}${Constants.TASKS_ENDPOINT}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(task)
-    });
-    return await response.json();
-  } catch (error) {
-    console.error("Error creando tarea:", error);
-  }
-};
+export async function fetchTasks() {
+  const res = await fetch(API.TASKS);
+  return handleResponse(res);
+}
 
-export const updateTask = async (id, updates) => {
-  try {
-    const response = await fetch(`${Constants.BASE_URL}${Constants.TASKS_ENDPOINT}/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates)
-    });
-    return await response.json();
-  } catch (error) {
-    console.error("Error actualizando tarea:", error);
+// Crear tarea con FormData (para fotos y ubicación)
+export async function createTask(task) {
+  const formData = new FormData();
+  formData.append('title', task.title);
+  formData.append('description', task.description || '');
+  if (task.photo instanceof File) {
+    formData.append('photo', task.photo); // archivo físico
   }
-};
+  if (task.location) {
+    formData.append('location', JSON.stringify(task.location));
+  }
 
-export const deleteTask = async (id) => {
-  try {
-    const response = await fetch(`${Constants.BASE_URL}${Constants.TASKS_ENDPOINT}/${id}`, {
-      method: 'DELETE'
-    });
-    return await response.json();
-  } catch (error) {
-    console.error("Error eliminando tarea:", error);
-  }
-};
+  const res = await fetch(API.TASKS, {
+    method: 'POST',
+    body: formData
+  });
+
+  return handleResponse(res);
+}
+
+// Actualizar tarea con FormData
+export async function updateTask(id, task) {
+  const formData = new FormData();
+  if (task.title) formData.append('title', task.title);
+  if (task.description) formData.append('description', task.description);
+  if (task.photo instanceof File) formData.append('photo', task.photo);
+  if (task.location) formData.append('location', JSON.stringify(task.location));
+
+  const res = await fetch(`${API.TASKS}/${id}`, {
+    method: 'PUT',
+    body: formData
+  });
+
+  return handleResponse(res);
+}
+
+export async function deleteTask(id) {
+  const res = await fetch(`${API.TASKS}/${id}`, { method: 'DELETE' });
+  return handleResponse(res);
+}
